@@ -27,11 +27,15 @@ export class BookController {
     @Get(':bookId')
     async getBook(@Param('bookId') bookId, @Query() params) {
         console.log(chalk.green('getBook bookId : ', bookId));
-        console.log(chalk.green('getBook params : ', params));
         console.log(chalk.blue.bold('getBook params : ', JSON.stringify(params)));
-        const book = await this.booksService.getOne(bookId, params);
-        console.log(chalk.green('getBook JSON.stringify(book) : ', JSON.stringify(book)));
-        return book;
+        if (bookId === 'authors') {
+            const authors: string[] = await this.booksService.getAuthors();
+            return authors;
+        } else {
+            const book = await this.booksService.getOne(bookId, params);
+            console.log(chalk.green('getBook JSON.stringify(book) : ', JSON.stringify(book)));
+            return book;
+        }
     }
 
     @Get(':bookId/light-book-editor')

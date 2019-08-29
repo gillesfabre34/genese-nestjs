@@ -28,6 +28,14 @@ export class BookService extends GenericDataService<Book> {
         });
     }
 
+    getAuthors(): Promise<string[]> {
+        return new Promise(resolve => {
+            const authors = [... new Set([...this.books.map(e => e.author)])];
+            console.log(chalk.green.bold('getAuthors authors'), authors);
+            resolve(authors);
+        });
+    }
+
     addBook(book): Promise<any> {
         console.log('addBook book', book);
         return new Promise(resolve => {
