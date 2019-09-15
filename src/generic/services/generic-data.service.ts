@@ -7,8 +7,12 @@ export abstract class GenericDataService<T> {
     books: unknown = BOOKS;
 
 
+    /**
+     * Get one book
+     * @param id
+     * @param query
+     */
     getOne(id: string, @Query() query): Promise<T> {
-        // console.log(chalk.magenta.bold('getOne query : ', JSON.stringify(query)));
         const dataFromDb = this.books as any[]; // TODO : link to real db
         return new Promise(resolve => {
             const book = dataFromDb.find(book => book.id === +id);
@@ -47,8 +51,6 @@ export abstract class GenericDataService<T> {
     getDataExtracted(@Query() params): Promise<any> {
         return new Promise(resolve => {
             let dataFromDb = this.books as T[]; // TODO : link to real db
-            console.log(chalk.yellow.bold('getAll params : ', JSON.stringify(params)));
-            console.log(chalk.yellow.bold('getAll params.gExtract : ', JSON.parse(params.gExtract)));
             if (params && params.gExtract) {
                 dataFromDb = this.extractFieldsFromData(dataFromDb, JSON.parse(params.gExtract));
             }
@@ -59,8 +61,6 @@ export abstract class GenericDataService<T> {
 
 
     extractFieldsFromData(data: any, extractionModel: string): any {
-        // console.log(chalk.cyan.bold('extractFieldsFromData extractionModel'), extractionModel);
-        // console.log(chalk.cyan.bold('extractFieldsFromData data'), data);
         if (!extractionModel) {
             return data;
         }
@@ -68,9 +68,7 @@ export abstract class GenericDataService<T> {
         console.log(chalk.cyan.bold('extractFieldsFromData parsedModel'), parsedModel);
         const result = {};
         for (const key of Object.keys(parsedModel)) {
-            // console.log(chalk.cyan.bold('extractFieldsFromData key'), key);
             Object.assign(result, {[key]: this.extractFieldsForOneProperty(data, key, parsedModel[key])});
-            // console.log(chalk.cyan.bold('extractFieldsFromData result'), result);
         }
         return result;
     }
@@ -82,11 +80,7 @@ export abstract class GenericDataService<T> {
                 extracts.push(this.extractFieldsForOneProperty(element, key, pathExtraction));
             }
         } else {
-            // console.log(chalk.green.bold('extractFieldsForOneProperty key'), key);
-            // console.log(chalk.green.bold('extractFieldsForOneProperty data[key]'), data[key]);
-            // console.log(chalk.green.bold('extractFieldsForOneProperty pathExtraction'), pathExtraction);
             const value = this.extractValue(data, key, pathExtraction);
-            console.log(chalk.green.bold('extractFieldsForOneProperty value'), value);
             return value;
         }
         return extracts;
@@ -111,6 +105,9 @@ export abstract class GenericDataService<T> {
     }
 }
 
+/**
+ * Interface for paginated results
+ */
 export interface GetAllResponse<T> {
     results: T[];
     totalResults: number;

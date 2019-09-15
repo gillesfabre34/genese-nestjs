@@ -54,7 +54,6 @@ export class BookService extends GenericDataService<Book> {
                 throw new HttpException('Book does not exist!', 404);
             }
             this.books.splice(index, 1);
-            // console.log(chalk.greenBright.bold('deleteBook this.books.length', this.books.length.toString()));
             resolve(this.books);
         });
     }
