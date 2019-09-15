@@ -8,7 +8,10 @@ import chalk from 'chalk';
 export class BookService extends GenericDataService<Book> {
     books = BOOKS;
 
-
+    /**
+     * Returns the edition field of a book with a "classic" route ':bookId/light-book-editor'
+     * @param bookID
+     */
     getLightBookEditor(bookID): Promise<any> {
         const id = Number(bookID);
         return new Promise(resolve => {
@@ -28,6 +31,24 @@ export class BookService extends GenericDataService<Book> {
         });
     }
 
+
+    /**
+     * Returns the authors of all books
+     * @param bookID
+     */
+    getAuthors(): Promise<string[]> {
+        return new Promise(resolve => {
+            const authors = [... new Set([...this.books.map(e => e.author)])];
+            console.log(chalk.green.bold('getAuthors authors'), authors);
+            resolve(authors);
+        });
+    }
+
+
+    /**
+     * Create a new book
+     * @param book
+     */
     addBook(book): Promise<any> {
         console.log('addBook book', book);
         return new Promise(resolve => {
@@ -37,6 +58,11 @@ export class BookService extends GenericDataService<Book> {
         });
     }
 
+
+    /**
+     * Delete a book
+     * @param bookID
+     */
     deleteBook(bookID): Promise<any> {
         console.log(chalk.greenBright.bold('deleteBook bookID : ', bookID));
         const id = Number(bookID);
@@ -46,7 +72,6 @@ export class BookService extends GenericDataService<Book> {
                 throw new HttpException('Book does not exist!', 404);
             }
             this.books.splice(index, 1);
-            // console.log(chalk.greenBright.bold('deleteBook this.books.length', this.books.length.toString()));
             resolve(this.books);
         });
     }

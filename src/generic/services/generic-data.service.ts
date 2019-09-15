@@ -7,8 +7,12 @@ export abstract class GenericDataService<T> {
     books: unknown = BOOKS;
 
 
+    /**
+     * Get one element
+     * @param id
+     * @param query
+     */
     getOne(id: string, @Query() query): Promise<T> {
-        // console.log(chalk.magenta.bold('getOne query : ', JSON.stringify(query)));
         const dataFromDb = this.books as any[]; // TODO : link to real db
         return new Promise(resolve => {
             const book = dataFromDb.find(book => book.id === +id);
@@ -21,6 +25,10 @@ export abstract class GenericDataService<T> {
     }
 
 
+    /**
+     * Get all elements
+     * @param params
+     */
     getAll(@Query() params): Promise<GetAllResponse<T>> {
         return new Promise(resolve => {
             let dataFromDb = this.books as T[]; // TODO : link to real db
@@ -32,6 +40,12 @@ export abstract class GenericDataService<T> {
         });
     }
 
+
+    /**
+     * Paginate results
+     * @param data
+     * @param params
+     */
     paginate<U = T>(data: U[], @Query() params): U[] {
         let results: U[] = [];
         if (Array.isArray(data) && params) {
@@ -44,11 +58,13 @@ export abstract class GenericDataService<T> {
     }
 
 
+    /**
+     * Return fields extracted from data with gnExtract param
+     * @param params
+     */
     getDataExtracted(@Query() params): Promise<any> {
         return new Promise(resolve => {
             let dataFromDb = this.books as T[]; // TODO : link to real db
-            console.log(chalk.yellow.bold('getAll params : ', JSON.stringify(params)));
-            console.log(chalk.yellow.bold('getAll params.gExtract : ', JSON.parse(params.gExtract)));
             if (params && params.gExtract) {
                 dataFromDb = this.extractFieldsFromData(dataFromDb, JSON.parse(params.gExtract));
             }
@@ -58,9 +74,13 @@ export abstract class GenericDataService<T> {
     }
 
 
+
+    /**
+     * Extract all the fields of some data corresponding to a given extraction model
+     * @param data
+     * @param extractionModel
+     */
     extractFieldsFromData(data: any, extractionModel: string): any {
-        // console.log(chalk.cyan.bold('extractFieldsFromData extractionModel'), extractionModel);
-        // console.log(chalk.cyan.bold('extractFieldsFromData data'), data);
         if (!extractionModel) {
             return data;
         }
@@ -68,13 +88,18 @@ export abstract class GenericDataService<T> {
         console.log(chalk.cyan.bold('extractFieldsFromData parsedModel'), parsedModel);
         const result = {};
         for (const key of Object.keys(parsedModel)) {
-            // console.log(chalk.cyan.bold('extractFieldsFromData key'), key);
             Object.assign(result, {[key]: this.extractFieldsForOneProperty(data, key, parsedModel[key])});
-            // console.log(chalk.cyan.bold('extractFieldsFromData result'), result);
         }
         return result;
     }
 
+    /**
+     * For a given key of an extraction model and with the path corresponding of this key,
+     * returns the fields from data which have the same key for the same path
+     * @param data
+     * @param key
+     * @param pathExtraction
+     */
     extractFieldsForOneProperty(data: any, key: string, pathExtraction: string): object {
         const extracts = [];
         if (Array.isArray(data)) {
@@ -82,17 +107,19 @@ export abstract class GenericDataService<T> {
                 extracts.push(this.extractFieldsForOneProperty(element, key, pathExtraction));
             }
         } else {
-            // console.log(chalk.green.bold('extractFieldsForOneProperty key'), key);
-            // console.log(chalk.green.bold('extractFieldsForOneProperty data[key]'), data[key]);
-            // console.log(chalk.green.bold('extractFieldsForOneProperty pathExtraction'), pathExtraction);
             const value = this.extractValue(data, key, pathExtraction);
-            console.log(chalk.green.bold('extractFieldsForOneProperty value'), value);
             return value;
         }
         return extracts;
     }
 
 
+    /**
+     * With a given key and a given path, extracts the value of a data object for this key and this path
+     * @param data
+     * @param key
+     * @param path
+     */
     extractValue(data: any, key: string, path: string): any {
         if (!data || !path) {
             return data;
@@ -111,6 +138,9 @@ export abstract class GenericDataService<T> {
     }
 }
 
+/**
+ * Interface for paginated results
+ */
 export interface GetAllResponse<T> {
     results: T[];
     totalResults: number;
