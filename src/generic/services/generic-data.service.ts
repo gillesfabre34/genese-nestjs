@@ -8,7 +8,7 @@ export abstract class GenericDataService<T> {
 
 
     /**
-     * Get one book
+     * Get one element
      * @param id
      * @param query
      */
@@ -25,6 +25,10 @@ export abstract class GenericDataService<T> {
     }
 
 
+    /**
+     * Get all elements
+     * @param params
+     */
     getAll(@Query() params): Promise<GetAllResponse<T>> {
         return new Promise(resolve => {
             let dataFromDb = this.books as T[]; // TODO : link to real db
@@ -36,6 +40,12 @@ export abstract class GenericDataService<T> {
         });
     }
 
+
+    /**
+     * Paginate results
+     * @param data
+     * @param params
+     */
     paginate<U = T>(data: U[], @Query() params): U[] {
         let results: U[] = [];
         if (Array.isArray(data) && params) {
@@ -48,6 +58,10 @@ export abstract class GenericDataService<T> {
     }
 
 
+    /**
+     * Return fields extracted from data with gnExtract param
+     * @param params
+     */
     getDataExtracted(@Query() params): Promise<any> {
         return new Promise(resolve => {
             let dataFromDb = this.books as T[]; // TODO : link to real db
@@ -60,6 +74,12 @@ export abstract class GenericDataService<T> {
     }
 
 
+
+    /**
+     * Extract all the fields of some data corresponding to a given extraction model
+     * @param data
+     * @param extractionModel
+     */
     extractFieldsFromData(data: any, extractionModel: string): any {
         if (!extractionModel) {
             return data;
@@ -73,6 +93,13 @@ export abstract class GenericDataService<T> {
         return result;
     }
 
+    /**
+     * For a given key of an extraction model and with the path corresponding of this key,
+     * returns the fields from data which have the same key for the same path
+     * @param data
+     * @param key
+     * @param pathExtraction
+     */
     extractFieldsForOneProperty(data: any, key: string, pathExtraction: string): object {
         const extracts = [];
         if (Array.isArray(data)) {
@@ -87,6 +114,12 @@ export abstract class GenericDataService<T> {
     }
 
 
+    /**
+     * With a given key and a given path, extracts the value of a data object for this key and this path
+     * @param data
+     * @param key
+     * @param path
+     */
     extractValue(data: any, key: string, path: string): any {
         if (!data || !path) {
             return data;
