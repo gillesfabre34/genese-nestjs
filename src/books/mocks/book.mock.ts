@@ -40,8 +40,13 @@ export const BOOKS = [
             },
             collection: undefined
         },
+<<<<<<< Updated upstream
         available: true,
         gTranslate: {
+=======
+        isavailable: true,
+        gnTranslate: {
+>>>>>>> Stashed changes
             en: {
                 type: 'novels'
             },

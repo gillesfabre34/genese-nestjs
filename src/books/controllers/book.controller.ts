@@ -10,6 +10,7 @@ const chalk = require('chalk');
 export class BookController {
     constructor(private booksService: BookService) { }
 
+<<<<<<< Updated upstream
     @Get()
     async getBooks(@Query() params): Promise<GetAllResponse<Book>> {
         console.log(chalk.blue('getBooks JSON.stringify(params) : ', JSON.stringify((params))));
@@ -24,6 +25,8 @@ export class BookController {
         return books;
     }
 
+=======
+>>>>>>> Stashed changes
     @Get(':bookId')
     async getBook(@Param('bookId') bookId, @Query() params) {
         console.log(chalk.green('getBook bookId : ', bookId));
@@ -40,6 +43,13 @@ export class BookController {
         const book = await this.booksService.getLightBookEditor(bookId);
         return book;
     }
+
+    @Get()
+    async getBooks(@Query() params): Promise<GetAllResponse<Book>> {
+        const books = await this.booksService.getAll(params);
+        return books;
+    }
+
 
     @Post()
     async addBook(@Body() createBookDTO: CreateBookDTO) {
