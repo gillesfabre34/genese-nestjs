@@ -42,7 +42,7 @@ export const BOOKS = [
             },
             collection: undefined
         },
-        isAvailable: true,
+        isavailable: true,
         gnTranslate: {
             en: {
                 type: 'novels'

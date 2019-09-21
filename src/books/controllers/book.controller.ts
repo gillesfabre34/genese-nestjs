@@ -8,18 +8,6 @@ import { GetAllResponse } from '../../generic/services/generic-data.service';
 export class BookController {
     constructor(private booksService: BookService) { }
 
-    @Get()
-    async getBooks(@Query() params): Promise<GetAllResponse<Book>> {
-        const books = await this.booksService.getAll(params);
-        return books;
-    }
-
-    @Get()
-    async getDataExtractedFromBooks(@Query() params): Promise<GetAllResponse<Book>> {
-        const books = await this.booksService.getDataExtracted(params);
-        return books;
-    }
-
     @Get(':bookId')
     async getBook(@Param('bookId') bookId, @Query() params) {
         if (bookId === 'authors') {
@@ -36,6 +24,13 @@ export class BookController {
         const book = await this.booksService.getLightBookEditor(bookId);
         return book;
     }
+
+    @Get()
+    async getBooks(@Query() params): Promise<GetAllResponse<Book>> {
+        const books = await this.booksService.getAll(params);
+        return books;
+    }
+
 
     @Post()
     async addBook(@Body() createBookDTO: CreateBookDTO) {
