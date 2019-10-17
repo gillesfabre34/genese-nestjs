@@ -1,8 +1,9 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, Query } from '@nestjs/common';
 import { BOOKS } from '../mocks/book.mock';
 import { Book } from '../models/book.model';
-import { GenericDataService } from '../../generic/services/generic-data.service';
+import { GenericDataService, GetAllResponse } from '../../generic/services/generic-data.service';
 import chalk from 'chalk';
+import { GnRequest } from '../../generic/gn-request';
 
 @Injectable()
 export class BookService extends GenericDataService<Book> {
@@ -34,13 +35,33 @@ export class BookService extends GenericDataService<Book> {
 
     /**
      * Returns the authors of all books
-     * @param bookID
+     * @param params
      */
-    getAuthors(): Promise<string[]> {
+    getCategories(@Query() params: GnRequest): Promise<string[]> {
         return new Promise(resolve => {
-            const authors = [... new Set([...this.books.map(e => e.author)])];
-            console.log(chalk.green.bold('getAuthors authors'), authors);
-            resolve(authors);
+            resolve(this.books[0].categories);
+        });
+    }
+
+
+    /**
+     * Returns the authors of all books
+     * @param params
+     */
+    getBooleans(@Query() params: GnRequest): Promise<boolean[]> {
+        return new Promise(resolve => {
+            resolve(this.books[0].booleans);
+        });
+    }
+
+
+    /**
+     * Returns the authors of all books
+     * @param params
+     */
+    getCodes(@Query() params: GnRequest): Promise<number[]> {
+        return new Promise(resolve => {
+            resolve(this.books[0].codes);
         });
     }
 
