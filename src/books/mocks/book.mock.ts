@@ -1,12 +1,12 @@
 export const BOOKS = [
     {
         id: 1,
-        bookTitle: 'The caves of steel',
-        description: 'In this novel, Isaac Asimov introduces Elijah Baley and R. Daneel Olivaw, later his favorite protagonists',
         author: 'Isaac Asimov',
-        codes: [2, 34, 53],
+        bookTitle: 'The caves of steel',
+        booleans: [true, false, false, true],
         categories: ['novels', 'science-fiction'],
-        irrelevantProperty: 'Irrelevant',
+        codes: [2, 34, 53],
+        description: 'In this novel, Isaac Asimov introduces Elijah Baley and R. Daneel Olivaw, later his favorite protagonists',
         editions: [
             {
                 name: 'La découverte',
@@ -42,6 +42,7 @@ export const BOOKS = [
             },
             collection: undefined
         },
+        irrelevantProperty: 'Irrelevant',
         isAvailable: true,
         gnTranslate: {
             en: {

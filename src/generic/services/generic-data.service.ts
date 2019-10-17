@@ -1,6 +1,7 @@
 import { HttpException, Injectable, Query } from '@nestjs/common';
 import { BOOKS } from '../../books/mocks/book.mock';
 import chalk from 'chalk';
+import { GnRequest } from '../gn-request';
 
 @Injectable()
 export abstract class GenericDataService<T> {
@@ -19,7 +20,7 @@ export abstract class GenericDataService<T> {
             if (!book) {
                 throw new HttpException('Book does not exist!', 404);
             }
-            const result = query && query.gExtract ? this.extractFieldsFromData(book, query.gExtract) : book;
+            const result = query && query.gnExtract ? this.extractFieldsFromData(book, query.gnExtract) : book;
             resolve(result);
         });
     }
@@ -29,13 +30,13 @@ export abstract class GenericDataService<T> {
      * Get all elements
      * @param params
      */
-    getAll(@Query() params): Promise<GetAllResponse<T>> {
+    getAll(@Query() params: GnRequest): Promise<GetAllResponse<T>> {
         return new Promise(resolve => {
             let dataFromDb = this.books as T[]; // TODO : link to real db
-            if (params && params.gExtract) {
-                dataFromDb = this.extractFieldsFromData(dataFromDb, JSON.parse(params.gExtract));
+            if (params && params.gnExtract) {
+                dataFromDb = this.extractFieldsFromData(dataFromDb, JSON.parse(params.gnExtract.toString()));
             }
-            const results = params && params.gPage ? this.paginate<T>(dataFromDb, params) : this.books as T[];
+            const results = params && params.gnPage ? this.paginate<T>(dataFromDb, params) : this.books as T[];
             resolve({results, totalResults: dataFromDb.length});
         });
     }
@@ -49,30 +50,13 @@ export abstract class GenericDataService<T> {
     paginate<U = T>(data: U[], @Query() params): U[] {
         let results: U[] = [];
         if (Array.isArray(data) && params) {
-            const limit = params.gLimit && params.gLimit > 0 ? params.gLimit : 10;
+            const limit = params.gnLimit && params.gnLimit > 0 ? params.gnLimit : 10;
             const nbPages = Math.round(data.length / limit) + 1;
-            const page = params.gPage && params.gPage >= 0 && params.gPage < nbPages ? params.gPage : nbPages;
+            const page = params.gnPage && params.gnPage >= 0 && params.gnPage < nbPages ? params.gnPage : nbPages;
             results = data.slice(limit * page, limit * (page + 1));
         }
         return results;
     }
-
-
-    /**
-     * Return fields extracted from data with gnExtract param
-     * @param params
-     */
-    getDataExtracted(@Query() params): Promise<any> {
-        return new Promise(resolve => {
-            let dataFromDb = this.books as T[]; // TODO : link to real db
-            if (params && params.gExtract) {
-                dataFromDb = this.extractFieldsFromData(dataFromDb, JSON.parse(params.gExtract));
-            }
-            const results = params && params.gPage ? this.paginate<T>(dataFromDb, params) : this.books as T[];
-            resolve({results, totalResults: dataFromDb.length});
-        });
-    }
-
 
 
     /**
