@@ -2,6 +2,7 @@ import { HttpException, Injectable, Query } from '@nestjs/common';
 import { BOOKS } from '../../books/mocks/book.mock';
 import chalk from 'chalk';
 import { GnRequest } from '../gn-request';
+import { of } from 'rxjs';
 
 @Injectable()
 export abstract class GenericDataService<T> {
@@ -30,15 +31,33 @@ export abstract class GenericDataService<T> {
      * Get all elements
      * @param params
      */
-    getAll(@Query() params: GnRequest): Promise<GetAllResponse<T>> {
+    getAll(@Query() params: GnRequest): Promise<any> {
         return new Promise(resolve => {
-            console.log(chalk.blue('getAll params '), params);
             let dataFromDb = this.books as T[]; // TODO : link to real db
             if (params && params.gnExtract) {
                 dataFromDb = this.extractFieldsFromData(dataFromDb, JSON.parse(params.gnExtract.toString()));
             }
-            const results = params && params.gnPageIndex ? this.paginate<T>(dataFromDb, params) : this.books as T[];
-            resolve({results, totalResults: dataFromDb.length});
+            resolve(dataFromDb);
+        });
+    }
+
+
+    /**
+     * Get all elements with pagination
+     * @param params
+     */
+    getAllWithPagination(@Query() params: any): Promise<any> {
+        if (!params || !params.pSize) {
+            console.error(chalk.red('Incorrect parameters for pagination'), JSON.stringify(params));
+            return of(undefined).toPromise();
+        }
+        return new Promise(resolve => {
+            let dataFromDb = this.books as T[]; // TODO : link to real db
+            if (params.gnExtract) {
+                dataFromDb = this.extractFieldsFromData(dataFromDb, JSON.parse(params.gnExtract.toString()));
+            }
+            const results = this.paginate<T>(dataFromDb, params.pSize, params.pIndex);
+            resolve({data: results, total: dataFromDb.length});
         });
     }
 
@@ -46,13 +65,14 @@ export abstract class GenericDataService<T> {
     /**
      * Paginate results
      * @param data
-     * @param params
+     * @param pageSize
+     * @param pageIndex
      */
-    paginate<U = T>(data: U[], @Query() params: GnRequest): U[] {
+    paginate<U = T>(data: U[], pageSize: number, pageIndex: number = 0): U[] {
         let results: U[] = [];
-        if (Array.isArray(data) && params && params.gnPageSize && params.gnPageIndex) {
-            let pageIndex = Number(params.gnPageIndex);
-            let pageSize = Number(params.gnPageSize);
+        pageIndex = Number(pageIndex);
+        pageSize = Number(pageSize);
+        if (Array.isArray(data) && pageSize) {
             pageSize = pageSize > 0 ? pageSize : 10;
             const nbPages = Math.round(data.length / pageSize) + 1;
             pageIndex = pageIndex >= 0 && pageIndex < nbPages ? pageIndex : nbPages;

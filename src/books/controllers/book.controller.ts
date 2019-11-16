@@ -24,8 +24,13 @@ export class BookController {
     }
 
     @Get()
-    async getBooks(@Query() params): Promise<GetAllResponse<Book>> {
-        const books = await this.booksService.getAll(params);
+    async getBooks(@Query() params): Promise<GetAllResponse<Book> | Book[]> {
+        let books = [];
+        if (params && params.pSize) {
+            books = await this.booksService.getAllWithPagination(params);
+        } else {
+            books = await this.booksService.getAll(params);
+        }
         return books;
     }
 
