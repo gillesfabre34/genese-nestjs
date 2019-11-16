@@ -32,11 +32,12 @@ export abstract class GenericDataService<T> {
      */
     getAll(@Query() params: GnRequest): Promise<GetAllResponse<T>> {
         return new Promise(resolve => {
+            console.log(chalk.blue('getAll params '), params);
             let dataFromDb = this.books as T[]; // TODO : link to real db
             if (params && params.gnExtract) {
                 dataFromDb = this.extractFieldsFromData(dataFromDb, JSON.parse(params.gnExtract.toString()));
             }
-            const results = params && params.gnPage ? this.paginate<T>(dataFromDb, params) : this.books as T[];
+            const results = params && params.gnPageIndex ? this.paginate<T>(dataFromDb, params) : this.books as T[];
             resolve({results, totalResults: dataFromDb.length});
         });
     }
@@ -47,13 +48,15 @@ export abstract class GenericDataService<T> {
      * @param data
      * @param params
      */
-    paginate<U = T>(data: U[], @Query() params): U[] {
+    paginate<U = T>(data: U[], @Query() params: GnRequest): U[] {
         let results: U[] = [];
-        if (Array.isArray(data) && params) {
-            const limit = params.gnLimit && params.gnLimit > 0 ? params.gnLimit : 10;
-            const nbPages = Math.round(data.length / limit) + 1;
-            const page = params.gnPage && params.gnPage >= 0 && params.gnPage < nbPages ? params.gnPage : nbPages;
-            results = data.slice(limit * page, limit * (page + 1));
+        if (Array.isArray(data) && params && params.gnPageSize && params.gnPageIndex) {
+            let pageIndex = Number(params.gnPageIndex);
+            let pageSize = Number(params.gnPageSize);
+            pageSize = pageSize > 0 ? pageSize : 10;
+            const nbPages = Math.round(data.length / pageSize) + 1;
+            pageIndex = pageIndex >= 0 && pageIndex < nbPages ? pageIndex : nbPages;
+            results = data.slice(pageSize * pageIndex, pageSize * (pageIndex + 1));
         }
         return results;
     }

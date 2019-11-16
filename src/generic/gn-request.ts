@@ -1,15 +1,15 @@
 
 export interface GnRequest {
-    gnPage?: number;
-    gnLimit?: number;
-    gnSort?: string;
-    gnOrder?: 'asc' | 'desc';
     gnCustomMapper?: boolean;
-    gnFilters?: {
-        [key: string]: string
-    };
-    gnPath?: string;
     gnExtract?: {
         [key: string]: any
     };
+    gnFilters?: {
+        [key: string]: string
+    };
+    gnOrder?: 'asc' | 'desc';
+    gnPageIndex?: number;
+    gnPageSize?: number;
+    gnPath?: string;
+    gnSort?: string;
 }
